@@ -12,7 +12,7 @@ Pour démarrer le service sous Linux pendant un premier essai :
 
 ```sh
 cd /opt/paradis-staff-api
-STAFF_API_HOST=0.0.0.0 STAFF_API_PORT=8091 node server.js
+STAFF_API_HOST=0.0.0.0 STAFF_API_PORT=6348 node server.js
 ```
 
 Laissez cette session SSH ouverte pendant l'essai. Pour que le service reste actif après la fermeture de SSH et redémarre après un redémarrage du serveur, lancez-le ensuite avec un gestionnaire de services comme `systemd` ou un gestionnaire de processus Node.
@@ -20,7 +20,7 @@ Laissez cette session SSH ouverte pendant l'essai. Pour que le service reste act
 Depuis votre ordinateur, vérifiez l'accès en ouvrant cette adresse dans un navigateur :
 
 ```text
-http://57.131.21.67:8091/health
+http://162.148.321.612:6348/health
 ```
 
 La réponse attendue est `{"status":"ok"}`. Si la page ne répond pas, vérifiez que le service tourne et que le port TCP 8091 est ouvert dans les deux pare-feu concernés.
@@ -31,11 +31,11 @@ Dans le fichier public `distribution.json`, ajoutez la propriété `staffAddon` 
 
 ```json
 "staffAddon": {
-  "apiUrl": "http://57.131.21.67:8091/v1"
+  "apiUrl": "http://162.148.321.612:6348/v1"
 }
 ```
 
-L'adresse utilise la même IP que la distribution, avec le port 8091. Le port fait partie de l'adresse : le launcher contacte bien le même serveur.
+L'adresse utilise la même IP que la distribution, avec le port 6348. Le port fait partie de l'adresse : le launcher contacte bien le même serveur.
 
 Cette configuration ne contient aucun secret. Le launcher vérifie que l'hôte de l'API correspond à celui de la distribution.
 
