@@ -298,6 +298,20 @@
                 </div>
                 <div class="settingsFileSelDesc"><%- lang('settings.dataDirectoryDesc') %></div>
             </div>
+            <div class="settingsFieldContainer">
+                <div class="settingsFieldLeft">
+                    <span class="settingsFieldTitle"><%- lang('settings.staffAddonTitle') %></span>
+                    <span class="settingsFieldDesc"><%- lang('settings.staffAddonDesc') %></span>
+                    <div id="settingsStaffAddonStatus" class="settingsFieldDesc" aria-live="polite"></div>
+                </div>
+                <div class="settingsFieldRight" style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+                    <input id="settingsStaffAddonCode" type="password" autocomplete="off" placeholder="<%- lang('settings.staffAddonCodePlaceholder') %>" style="max-width:240px">
+                    <div style="display:flex;gap:8px">
+                        <button id="settingsStaffAddonRedeem" class="settingsAboutButton"><%- lang('settings.staffAddonRedeem') %></button>
+                        <button id="settingsStaffAddonForget" class="settingsAboutButton"><%- lang('settings.staffAddonForget') %></button>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="settingsTabAbout" class="settingsTab" style="display: none;">
             <div class="settingsTabHeader">

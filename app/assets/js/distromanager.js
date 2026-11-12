@@ -15,3 +15,18 @@ const api = new DistributionAPI(
 )
 
 exports.DistroAPI = api
+
+function getStaffAddonApiUrl(distribution){
+    const configured = distribution?.rawDistribution?.staffAddon?.apiUrl
+    const distroUrl = new URL(exports.REMOTE_DISTRO_URL)
+    // Nebula does not currently emit custom staffAddon metadata, so default
+    // to the staff API port on the same host. A distro field can override it.
+    const apiUrl = configured
+        ? new URL(configured, distroUrl)
+        : new URL(`${distroUrl.protocol}//${distroUrl.hostname}:8091/v1`)
+    if(apiUrl.hostname !== distroUrl.hostname) throw new Error('The staff API must use the distribution host.')
+    return apiUrl.toString().replace(/\/$/, '')
+}
+
+api.getStaffAddonApiUrl = getStaffAddonApiUrl
+exports.getStaffAddonApiUrl = getStaffAddonApiUrl

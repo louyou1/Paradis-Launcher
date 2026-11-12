@@ -12,6 +12,16 @@ const semver                            = require('semver')
 const { pathToFileURL }                 = require('url')
 const { AZURE_CLIENT_ID, MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR, SHELL_OPCODE } = require('./app/assets/js/ipcconstants')
 const LangLoader                        = require('./app/assets/js/langloader')
+const StaffAddon                        = require('./app/assets/js/staffaddon')
+
+ipcMain.handle('staffAddon:redeem', async (_event, apiUrl, code) => StaffAddon.redeem(apiUrl, code))
+ipcMain.handle('staffAddon:forget', async (_event, apiUrl) => StaffAddon.forget(apiUrl))
+ipcMain.handle('staffAddon:status', async (_event, apiUrl, serverId) => {
+    const manifest = await StaffAddon.getManifest(apiUrl, serverId)
+    return { unlocked: manifest.authorized === true, moduleCount: manifest.modules.length }
+})
+ipcMain.handle('staffAddon:prepare', async (_event, apiUrl, serverId, commonDir, instanceDir) =>
+    StaffAddon.prepare(apiUrl, serverId, commonDir, instanceDir))
 
 // Setup Lang
 LangLoader.setupLanguage()

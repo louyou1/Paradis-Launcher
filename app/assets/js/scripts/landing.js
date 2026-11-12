@@ -458,6 +458,19 @@ async function dlAsync(login = true) {
 
     try {
         distro = await DistroAPI.refreshDistributionOrFallback()
+        const selectedServerId = ConfigManager.getSelectedServer()
+        const staffModules = await ipcRenderer.invoke('staffAddon:prepare', DistroAPI.getStaffAddonApiUrl(distro), selectedServerId,
+            ConfigManager.getCommonDirectory(), ConfigManager.getInstanceDirectory())
+        if(staffModules.length > 0){
+            const rawDistribution = JSON.parse(JSON.stringify(distro.rawDistribution))
+            const rawServer = rawDistribution.servers.find(server => server.id === selectedServerId)
+            if(!rawServer) throw new Error('Selected server was not found in the distribution.')
+            const baseIds = new Set((rawServer.modules || []).map(module => module.id))
+            const additions = staffModules.filter(module => !baseIds.has(module.id))
+            rawServer.modules = [...(rawServer.modules || []), ...additions]
+            distro = new (require('helios-core/common').HeliosDistribution)(rawDistribution,
+                ConfigManager.getCommonDirectory(), ConfigManager.getInstanceDirectory())
+        }
         onDistroRefresh(distro)
     } catch(err) {
         loggerLaunchSuite.error('Unable to refresh distribution index.', err)

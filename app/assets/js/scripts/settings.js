@@ -77,6 +77,50 @@ function bindFileSelectors(){
 
 bindFileSelectors()
 
+async function refreshStaffAddonStatus(){
+    const status = document.getElementById('settingsStaffAddonStatus')
+    const apiUrl = DistroAPI.getStaffAddonApiUrl(await DistroAPI.getDistribution())
+    const serverId = ConfigManager.getSelectedServer()
+    status.textContent = Lang.queryJS('settings.staffAddon.checking')
+    try {
+        const result = await ipcRenderer.invoke('staffAddon:status', apiUrl, serverId)
+        status.textContent = result.unlocked
+            ? Lang.queryJS('settings.staffAddon.unlocked', { count: result.moduleCount })
+            : Lang.queryJS('settings.staffAddon.locked')
+    } catch(err) {
+        status.textContent = err.message || Lang.queryJS('settings.staffAddon.error')
+    }
+}
+
+document.getElementById('settingsStaffAddonRedeem').addEventListener('click', async () => {
+    const codeInput = document.getElementById('settingsStaffAddonCode')
+    const status = document.getElementById('settingsStaffAddonStatus')
+    const code = codeInput.value.trim()
+    if(!code) return
+    status.textContent = Lang.queryJS('settings.staffAddon.checking')
+    try {
+        const apiUrl = DistroAPI.getStaffAddonApiUrl(await DistroAPI.getDistribution())
+        await ipcRenderer.invoke('staffAddon:redeem', apiUrl, code)
+        codeInput.value = ''
+        await refreshStaffAddonStatus()
+    } catch(err) {
+        status.textContent = err.message || Lang.queryJS('settings.staffAddon.error')
+    }
+})
+
+document.getElementById('settingsStaffAddonForget').addEventListener('click', async () => {
+    const status = document.getElementById('settingsStaffAddonStatus')
+    try {
+        const apiUrl = DistroAPI.getStaffAddonApiUrl(await DistroAPI.getDistribution())
+        await ipcRenderer.invoke('staffAddon:forget', apiUrl)
+        await refreshStaffAddonStatus()
+    } catch(err) {
+        status.textContent = err.message || Lang.queryJS('settings.staffAddon.error')
+    }
+})
+
+refreshStaffAddonStatus()
+
 
 /**
  * General Settings Functions

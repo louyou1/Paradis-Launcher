@@ -105,6 +105,11 @@ dataDirectoryTitle = "Dossier de données"
 selectDataDirectory = "Choisir le dossier de données"
 chooseFolder = "Choisir un dossier"
 dataDirectoryDesc = "Les fichiers du jeu et les installations Java locales seront enregistrés dans ce dossier.<br>Les captures d'écran et les sauvegardes se trouvent dans le dossier de l'instance correspondant à la configuration du serveur."
+staffAddonTitle = "Extensions réservées au staff"
+staffAddonDesc = "Utilisez un code à usage unique pour télécharger les mods privés du serveur sélectionné."
+staffAddonCodePlaceholder = "Code staff à usage unique"
+staffAddonRedeem = "Activer"
+staffAddonForget = "Retirer l’accès"
 aboutTabHeaderText = "À propos"
 aboutTabHeaderDesc = "Consultez la version actuelle et ses notes de publication."
 aboutTitle = "{appName}"
@@ -220,6 +225,12 @@ dismiss = "Fermer"
 [js.settings.fileSelectors]
 executables = "Exécutables"
 allFiles = "Tous les fichiers"
+
+[js.settings.staffAddon]
+checking = "Vérification de l’accès staff…"
+locked = "L’accès staff n’est pas activé sur cet appareil."
+unlocked = "Accès staff activé ({count} extensions)."
+error = "Impossible de vérifier l’accès staff."
 
 [js.settings.mstfLogin]
 errorTitle = "Un problème est survenu"

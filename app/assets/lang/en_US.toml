@@ -105,6 +105,11 @@ dataDirectoryTitle = "Data Directory"
 selectDataDirectory = "Select Data Directory"
 chooseFolder = "Choose Folder"
 dataDirectoryDesc = "All game files and local Java installations will be stored in the data directory.<br>Screenshots and world saves are stored in the instance folder for the corresponding server configuration."
+staffAddonTitle = "Staff Add-on"
+staffAddonDesc = "Redeem a one-time staff code to download private client mods for the selected server."
+staffAddonCodePlaceholder = "One-time staff code"
+staffAddonRedeem = "Unlock"
+staffAddonForget = "Remove access"
 aboutTabHeaderText = "About"
 aboutTabHeaderDesc = "View information and release notes for the current version."
 aboutTitle = "{appName}"
@@ -221,6 +226,12 @@ dismiss = "Dismiss"
 [js.settings.fileSelectors]
 executables = "Executables"
 allFiles = "All Files"
+
+[js.settings.staffAddon]
+checking = "Checking staff access…"
+locked = "Staff access is not enabled on this device."
+unlocked = "Staff access enabled ({count} add-ons)."
+error = "Unable to check staff access."
 
 [js.settings.mstfLogin]
 errorTitle = "Something Went Wrong"
