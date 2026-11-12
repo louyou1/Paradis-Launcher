@@ -1,6 +1,7 @@
 const AdmZip                = require('adm-zip')
 const child_process         = require('child_process')
 const crypto                = require('crypto')
+const { EventEmitter }      = require('events')
 const fs                    = require('fs-extra')
 const { LoggerUtil }        = require('helios-core')
 const { getMojangOS, isLibraryCompatible, mcVersionAtLeast }  = require('helios-core/common')
@@ -40,6 +41,75 @@ class ProcessBuilder {
         this.usingFabricLoader = false
         this.llPath = null
     }
+
+    /**
+     * Remove manually added mod archives from this server instance before launch.
+     * Server-managed mods are stored separately in the launcher's common directory.
+     */
+    removeManualMods(){
+        const modsDir = path.join(this.gameDir, 'mods')
+        if(!fs.existsSync(modsDir) || !fs.statSync(modsDir).isDirectory()){
+            return 0
+        }
+
+        let removedCount = 0
+        const removeModArchives = (directory) => {
+            for(const entry of fs.readdirSync(directory, { withFileTypes: true })){
+                const entryPath = path.join(directory, entry.name)
+                if(entry.isDirectory()){
+                    removeModArchives(entryPath)
+                } else if(entry.isFile() && /\.(?:jar|zip|litemod)(?:\.disabled)?$/i.test(entry.name)){
+                    fs.removeSync(entryPath)
+                    removedCount++
+                }
+            }
+        }
+
+        removeModArchives(modsDir)
+        if(removedCount > 0){
+            logger.info(`Removed ${removedCount} manually added mod archive(s) from`, modsDir)
+        }
+        return removedCount
+    }
+
+    /**
+     * Read a detached game's output from a log file so it does not keep a pipe
+     * connected to the launcher process.
+     */
+    createLogOutput(logPath){
+        const output = new EventEmitter()
+        let position = 0
+        const poller = setInterval(() => {
+            try {
+                const size = fs.statSync(logPath).size
+                if(size < position){
+                    position = 0
+                }
+                if(size > position){
+                    const fd = fs.openSync(logPath, 'r')
+                    const buffer = Buffer.alloc(size - position)
+                    let bytesRead
+                    try {
+                        bytesRead = fs.readSync(fd, buffer, 0, buffer.length, position)
+                    } finally {
+                        fs.closeSync(fd)
+                    }
+                    position += bytesRead
+                    if(bytesRead > 0){
+                        output.emit('data', buffer.toString('utf8', 0, bytesRead))
+                    }
+                }
+            } catch(err) {
+                if(err.code !== 'ENOENT'){
+                    logger.warn('Unable to read detached game output.', err)
+                }
+            }
+        }, 100)
+        poller.unref()
+        output.setEncoding = () => output
+        output.stop = () => clearInterval(poller)
+        return output
+    }
     
     /**
      * Convienence method to run the functions typically used to build a process.
@@ -77,13 +147,34 @@ class ProcessBuilder {
 
         logger.info('Launch Arguments:', loggableArgs)
 
-        const child = child_process.spawn(ConfigManager.getJavaExecutable(this.server.rawServer.id), args, {
-            cwd: this.gameDir,
-            detached: ConfigManager.getLaunchDetached()
-        })
+        this.removeManualMods()
 
-        if(ConfigManager.getLaunchDetached()){
+        const launchDetached = ConfigManager.getLaunchDetached()
+        let child
+        if(launchDetached){
+            fs.ensureDirSync(tempNativePath)
+            const stdoutLogPath = path.join(tempNativePath, 'minecraft.stdout.log')
+            const stderrLogPath = path.join(tempNativePath, 'minecraft.stderr.log')
+            const stdoutFd = fs.openSync(stdoutLogPath, 'a')
+            const stderrFd = fs.openSync(stderrLogPath, 'a')
+            try {
+                child = child_process.spawn(ConfigManager.getJavaExecutable(this.server.rawServer.id), args, {
+                    cwd: this.gameDir,
+                    detached: true,
+                    stdio: ['ignore', stdoutFd, stderrFd]
+                })
+            } finally {
+                fs.closeSync(stdoutFd)
+                fs.closeSync(stderrFd)
+            }
+            child.stdout = this.createLogOutput(stdoutLogPath)
+            child.stderr = this.createLogOutput(stderrLogPath)
             child.unref()
+        } else {
+            child = child_process.spawn(ConfigManager.getJavaExecutable(this.server.rawServer.id), args, {
+                cwd: this.gameDir,
+                detached: false
+            })
         }
 
         child.stdout.setEncoding('utf8')
@@ -98,6 +189,8 @@ class ProcessBuilder {
         })
         child.on('close', (code) => {
             logger.info('Exited with code', code)
+            child.stdout.stop?.()
+            child.stderr.stop?.()
             fs.remove(tempNativePath, (err) => {
                 if(err){
                     logger.warn('Error while deleting temp dir', err)

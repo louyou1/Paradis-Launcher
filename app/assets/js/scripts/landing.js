@@ -568,6 +568,13 @@ async function dlAsync(login = true) {
             }
             proc.stdout.removeListener('data', tempListener)
             proc.stderr.removeListener('data', gameErrorListener)
+
+            if(ConfigManager.getLaunchDetached()){
+                loggerLanding.info('Minecraft started. Closing the launcher.')
+                remote.app.quit()
+            } else {
+                loggerLanding.info('Minecraft started. Keeping the launcher open because the game is not detached.')
+            }
         }
         const start = Date.now()
 
@@ -576,7 +583,8 @@ async function dlAsync(login = true) {
         // the client application has started, and we can hide
         // the progress bar stuff.
         const tempListener = function(data){
-            if(GAME_LAUNCH_REGEX.test(data.trim())){
+            const gameStarted = data.trim().split(/\r?\n/).some(line => GAME_LAUNCH_REGEX.test(line.trim()))
+            if(gameStarted){
                 const diff = Date.now()-start
                 if(diff < MIN_LINGER) {
                     setTimeout(onLoadComplete, MIN_LINGER-diff)

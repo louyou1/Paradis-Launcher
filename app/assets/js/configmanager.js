@@ -99,7 +99,10 @@ const DEFAULT_CONFIG = {
     selectedAccount: null,
     authenticationDatabase: {},
     modConfigurations: [],
-    javaConfig: {}
+    javaConfig: {},
+    launcherMigrations: {
+        detachedLaunchDefaultEnabled: true
+    }
 }
 
 let config = null
@@ -147,6 +150,21 @@ exports.load = function(){
             exports.save()
         }
         if(doValidate){
+            // Enable detached game launching by default for existing profiles too.
+            // The migration marker ensures a user's later choice can still be saved.
+            if(config.launcherMigrations?.detachedLaunchDefaultEnabled !== true){
+                if(!config.settings || typeof config.settings !== 'object'){
+                    config.settings = {}
+                }
+                if(!config.settings.game || typeof config.settings.game !== 'object'){
+                    config.settings.game = {}
+                }
+                config.settings.game.launchDetached = true
+                config.launcherMigrations = {
+                    ...(config.launcherMigrations && typeof config.launcherMigrations === 'object' ? config.launcherMigrations : {}),
+                    detachedLaunchDefaultEnabled: true
+                }
+            }
             config = validateKeySet(DEFAULT_CONFIG, config)
             exports.save()
         }
