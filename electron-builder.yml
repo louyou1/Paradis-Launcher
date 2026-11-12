@@ -1,5 +1,10 @@
 appId: 'paradislauncher'
 productName: 'Paradis Launcher'
+publish:
+  provider: github
+  owner: louyou1
+  repo: Paradis-Launcher
+  releaseType: release
 artifactName: '${productName}-setup-${version}.${ext}'
 
 copyright: 'Copyright © 2018-2026 Daniel Scalzi'
@@ -30,6 +35,10 @@ nsis:
 mac:
   target:
     - target: 'dmg'
+      arch:
+        - 'x64'
+        - 'arm64'
+    - target: 'zip'
       arch:
         - 'x64'
         - 'arm64'

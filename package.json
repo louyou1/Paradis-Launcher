@@ -5,9 +5,9 @@
   "description": "Launcher Minecraft du serveur Paradis",
   "author": "Daniel Scalzi (https://github.com/dscalzi/) modif by lou-you",
   "license": "UNLICENSED",
-  "homepage": "https://github.com/dscalzi/HeliosLauncher",
+  "homepage": "https://github.com/louyou1/Paradis-Launcher",
   "bugs": {
-    "url": "https://github.com/dscalzi/HeliosLauncher/issues"
+    "url": "https://github.com/louyou1/Paradis-Launcher/issues"
   },
   "private": true,
   "main": "index.js",
@@ -17,7 +17,11 @@
     "dist:win": "npm run dist -- -w",
     "dist:mac": "npm run dist -- -m",
     "dist:linux": "npm run dist -- -l",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "release": "electron-builder build --publish always",
+    "release:win": "npm run release -- -w",
+    "release:mac": "npm run release -- -m",
+    "release:linux": "npm run release -- -l"
   },
   "engines": {
     "node": "22.x.x"
@@ -47,6 +51,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dscalzi/HeliosLauncher.git"
+    "url": "git+https://github.com/louyou1/Paradis-Launcher.git"
   }
 }

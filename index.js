@@ -19,12 +19,7 @@ LangLoader.setupLanguage()
 // Setup auto updater.
 function initAutoUpdater(event, data) {
 
-    if(data){
-        autoUpdater.allowPrerelease = false
-    } else {
-        // Defaults to true if application version contains prerelease components (e.g. 0.12.1-alpha.1)
-        // autoUpdater.allowPrerelease = true
-    }
+    autoUpdater.allowPrerelease = Boolean(data)
     
     if(isDev){
         autoUpdater.autoInstallOnAppQuit = false
@@ -48,6 +43,12 @@ function initAutoUpdater(event, data) {
     autoUpdater.on('error', (err) => {
         event.sender.send('autoUpdateNotification', 'realerror', err)
     }) 
+
+    // Check for a new launcher release as soon as the updater is initialized.
+    autoUpdater.checkForUpdates()
+        .catch(err => {
+            event.sender.send('autoUpdateNotification', 'realerror', err)
+        })
 }
 
 // Open channel to listen for update actions.
@@ -148,8 +149,8 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGIN, (ipcEvent, ...arguments_) => {
             let queryMap = {}
             
             new URL(uri).searchParams.forEach((v, k) => {
-                queryMap[k] = v;
-            });
+                queryMap[k] = v
+            })
 
             ipcEvent.reply(MSFT_OPCODE.REPLY_LOGIN, MSFT_REPLY_TYPE.SUCCESS, queryMap, msftAuthViewSuccess)
 

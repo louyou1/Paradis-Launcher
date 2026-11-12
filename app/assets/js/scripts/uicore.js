@@ -38,7 +38,29 @@ webFrame.setVisualZoomLevelLimits(1, 1)
 // Initialize auto updates in production environments.
 let updateCheckListener
 if(!isDev){
-    // Auto-update désactivé pour Paradis Launcher.
+    ipcRenderer.on('autoUpdateNotification', (_event, action, data) => {
+        switch(action) {
+            case 'update-available':
+                showUpdateUI(data)
+                prepareUpdateTab(data)
+                break
+            case 'update-not-available':
+                prepareUpdateTab()
+                break
+            case 'update-downloaded':
+                prepareUpdateTab(data)
+                settingsUpdateButtonStatus(Lang.queryJS('settings.updates.installNowButton'), false, () => {
+                    ipcRenderer.send('autoUpdateAction', 'installUpdateNow')
+                })
+                break
+            case 'checking-for-update':
+                break
+            case 'realerror':
+                loggerAutoUpdater.error('Update check failed.', data)
+                prepareUpdateTab()
+                break
+        }
+    })
 }
 
 /**
