@@ -105,7 +105,11 @@ class ProcessBuilder {
                 }
             }
         }, 100)
-        poller.unref()
+        // Chromium's setInterval returns a numeric id; Node.js returns a
+        // Timeout object with unref(). The poller runs in the renderer here.
+        if(typeof poller.unref === 'function'){
+            poller.unref()
+        }
         output.setEncoding = () => output
         output.stop = () => clearInterval(poller)
         return output
