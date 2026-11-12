@@ -61,6 +61,8 @@ async function showMainUI(data){
 
     if(!isDev){
         loggerAutoUpdater.info('Initializing..')
+        // Keep gameplay disabled until the updater has checked the published version.
+        setLaunchEnabled(false)
         ipcRenderer.send('autoUpdateAction', 'initAutoUpdater', ConfigManager.getAllowPrerelease())
     }
 

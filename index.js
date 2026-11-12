@@ -33,6 +33,8 @@ function initAutoUpdater(event, data) {
     })
     autoUpdater.on('update-downloaded', (info) => {
         event.sender.send('autoUpdateNotification', 'update-downloaded', info)
+        // Apply the update as soon as the renderer has time to show its status.
+        setTimeout(() => autoUpdater.quitAndInstall(), 1500)
     })
     autoUpdater.on('update-not-available', (info) => {
         event.sender.send('autoUpdateNotification', 'update-not-available', info)

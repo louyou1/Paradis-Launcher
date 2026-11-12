@@ -278,6 +278,7 @@ downloadButton = 'Download from GitHub<span style="font-size: 10px;color: gray;t
 latestVersionTitle = "You Are Running the Latest Version"
 checkForUpdatesButton = "Check for Updates"
 checkingForUpdatesButton = "Checking for Updates.."
+installingButton = "Installing update..."
 
 [js.settings.msftLogin]
 errorTitle = "Microsoft Login Failed"

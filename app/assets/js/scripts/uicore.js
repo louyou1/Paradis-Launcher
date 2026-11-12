@@ -41,22 +41,24 @@ if(!isDev){
     ipcRenderer.on('autoUpdateNotification', (_event, action, data) => {
         switch(action) {
             case 'update-available':
+                setLaunchEnabled(false)
                 showUpdateUI(data)
                 prepareUpdateTab(data)
                 break
             case 'update-not-available':
+                setLaunchEnabled(ConfigManager.getSelectedServer() != null)
                 prepareUpdateTab()
                 break
             case 'update-downloaded':
                 prepareUpdateTab(data)
-                settingsUpdateButtonStatus(Lang.queryJS('settings.updates.installNowButton'), false, () => {
-                    ipcRenderer.send('autoUpdateAction', 'installUpdateNow')
-                })
+                settingsUpdateButtonStatus(Lang.queryJS('settings.updates.installingButton'), true)
                 break
             case 'checking-for-update':
+                setLaunchEnabled(false)
                 break
             case 'realerror':
                 loggerAutoUpdater.error('Update check failed.', data)
+                setLaunchEnabled(ConfigManager.getSelectedServer() != null)
                 prepareUpdateTab()
                 break
         }
